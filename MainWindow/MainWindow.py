@@ -1,16 +1,18 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from MainWindow.Dialogs.Pemasukan import Ui_Pemasukan
+from MainWindow.Dialogs.Pengeluaran import Ui_Pengeluaran
+from MainWindow.Dialogs.Riwayat import Ui_Riwayat
+from Repositories.MoneyRepository import Money
 import source
-from Pemasukan import Ui_Pemasukan
-from Pengeluaran import Ui_Pengeluaran
-from Riwayat import Ui_Riwayat
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
+    initBalance = QtCore.pyqtSignal()
+
     def pemasukan(self):
-        self.pemasukan = QtWidgets.QDialog()
-        self.ui = Ui_Pemasukan()
-        self.ui.setupUi(self.pemasukan)
-        self.pemasukan.show()
+        pemasukan_view = Ui_Pemasukan(self, self.db, self.userId)
+        pemasukan_view.setBalance.connect(self.updateBalance)
+        pemasukan_view.show()
 
     def pengeluaran(self):
         self.pengeluaran = QtWidgets.QDialog()
@@ -24,9 +26,25 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self.riwayat)
         self.riwayat.show()
 
-    def __init__(self, db):
+    def updateBalance(self, balance):
+        self.lineEdit.setText(str(balance))
+
+    def getBalance(self):
+        (result, error) = Money(self.db).getBalance(self.userId)
+        if not error:
+            self.updateBalance(result)
+        else:
+            QtWidgets.QMessageBox(
+                QtWidgets.QMessageBox.Critical,
+                "Error",
+                "Database Error"
+            ).exec()
+            self.close()
+
+    def __init__(self, db, userId):
         super().__init__()
         self.db = db
+        self.userId = userId
         self.setObjectName("MainWindow")
         self.resize(400, 560)
         self.setMinimumSize(QtCore.QSize(400, 560))
@@ -74,6 +92,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.lineEdit.setGeometry(QtCore.QRect(160, 237, 171, 31))
         self.lineEdit.setStyleSheet("background-color: rgb(240, 240, 240);")
         self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit.setReadOnly(True)
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(70, 240, 81, 31))
         self.label_3.setStyleSheet("font: 63 10pt \"Montserrat SemiBold\";")
@@ -99,6 +118,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.retranslateUi(self)
         QtCore.QMetaObject.connectSlotsByName(self)
+        self.initBalance.connect(self.getBalance)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

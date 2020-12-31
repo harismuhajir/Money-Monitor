@@ -18,7 +18,7 @@ class WindowSelector:
         self.register_view = Register(db)
         self.register_view.switchWindow.connect(self.switch_window)
         self.register_view.setUser.connect(self.set_user)
-        self.main_view = MainWindow(db)
+        self.main_view = MainWindow(db, self.logged_in_user)
         self.show_window("LOGIN")
 
     def show_window(self, window):
@@ -31,6 +31,8 @@ class WindowSelector:
         elif window == "MAIN":
             if self.logged_in_user != "":
                 self.current_window = self.main_view
+                self.current_window.userId = self.logged_in_user
+                self.current_window.initBalance.emit()
                 self.current_window.show()
 
     def switch_window(self, window):
