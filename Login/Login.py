@@ -1,15 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import source
-
-
-class MyQLabel(QtWidgets.QLabel):
-    clicked = QtCore.pyqtSignal()
-
-    def __init__(self, parent=None):
-        QtWidgets.QLabel.__init__(self, parent)
-
-    def mousePressEvent(self, ev):
-        self.clicked.emit()
+from MyUi import MyLabel
 
 
 class Ui_Login(QtWidgets.QWidget):
@@ -86,7 +77,7 @@ class Ui_Login(QtWidgets.QWidget):
         font.setPointSize(9)
         self.label_7.setFont(font)
         self.label_7.setObjectName("label_7")
-        self.label_8 = MyQLabel(self)
+        self.label_8 = MyLabel(self)
         self.label_8.setGeometry(QtCore.QRect(240, 430, 51, 20))
         font = QtGui.QFont()
         font.setFamily("Montserrat Medium")

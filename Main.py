@@ -13,6 +13,7 @@ class WindowSelector:
         self.login_view = Login()
         self.login_view.switchWindow.connect(self.switch_window)
         self.register_view = Register()
+        self.register_view.switchWindow.connect(self.switch_window)
         self.show_window("LOGIN")
 
     def show_window(self, window):

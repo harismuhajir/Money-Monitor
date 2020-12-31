@@ -1,8 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from MyUi import MyLabel
 import source
 
 
 class Ui_Register(QtWidgets.QWidget):
+    switchWindow = QtCore.pyqtSignal(str)
+
     def __init__(self):
         super().__init__()
         self.setObjectName("Form")
@@ -74,7 +77,7 @@ class Ui_Register(QtWidgets.QWidget):
         font.setPointSize(9)
         self.label_7.setFont(font)
         self.label_7.setObjectName("label_7")
-        self.label_8 = QtWidgets.QLabel(self)
+        self.label_8 = MyLabel(self)
         self.label_8.setGeometry(QtCore.QRect(240, 490, 51, 20))
         font = QtGui.QFont()
         font.setFamily("Montserrat Medium")
@@ -84,6 +87,8 @@ class Ui_Register(QtWidgets.QWidget):
         self.label_8.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.label_8.setStyleSheet("color: rgb(0, 0, 255);")
         self.label_8.setObjectName("label_8")
+        self.label_8.clicked.connect(self.gotoLogin)
+
         self.lineEdit_3 = QtWidgets.QLineEdit(self)
         self.lineEdit_3.setGeometry(QtCore.QRect(70, 380, 261, 31))
         font = QtGui.QFont()
@@ -118,3 +123,6 @@ class Ui_Register(QtWidgets.QWidget):
         self.lineEdit_3.setPlaceholderText(
             _translate("Form", "Ulangi password"))
         self.label_9.setText(_translate("Form", "Ulangi Password"))
+
+    def gotoLogin(self):
+        self.switchWindow.emit("LOGIN")
