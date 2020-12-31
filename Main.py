@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from Login.Login import Ui_Login as Login
 from Register.Register import Ui_Register as Register
+from MainWindow.MainWindow import Ui_MainWindow as MainWindow
 from dotenv import load_dotenv
 from pathlib import Path
 import os
@@ -9,11 +10,14 @@ import pymysql
 
 
 class WindowSelector:
-    def __init__(self):
+    def __init__(self, db):
+        self.logged_in_user = ""
         self.login_view = Login()
         self.login_view.switchWindow.connect(self.switch_window)
-        self.register_view = Register()
+        self.register_view = Register(db)
         self.register_view.switchWindow.connect(self.switch_window)
+        self.register_view.setUser.connect(self.set_user)
+        self.main_view = MainWindow(db)
         self.show_window("LOGIN")
 
     def show_window(self, window):
@@ -23,10 +27,17 @@ class WindowSelector:
         elif window == "REGISTER":
             self.current_window = self.register_view
             self.current_window.show()
+        elif window == "MAIN":
+            if self.logged_in_user != "":
+                self.current_window = self.main_view
+                self.current_window.show()
 
     def switch_window(self, window):
         self.current_window.close()
         self.show_window(window)
+
+    def set_user(self, userId):
+        self.logged_in_user = userId
 
 
 def setupDb():
@@ -111,7 +122,7 @@ if __name__ == '__main__':
         if(migrated == 0):
             migrateDb(cursor)
 
-        window_selector = WindowSelector()
+        window_selector = WindowSelector(db)
         aex = app.exec_()
         db.close()
         sys.exit(aex)

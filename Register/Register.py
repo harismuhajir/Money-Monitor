@@ -1,13 +1,17 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from MyUi import MyLabel
+from Repositories.UserRepository import User
 import source
 
 
 class Ui_Register(QtWidgets.QWidget):
     switchWindow = QtCore.pyqtSignal(str)
+    setUser = QtCore.pyqtSignal(str)
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
+        self.db = db
+
         self.setObjectName("Form")
         self.resize(400, 560)
         self.setMinimumSize(QtCore.QSize(400, 560))
@@ -65,6 +69,8 @@ class Ui_Register(QtWidgets.QWidget):
                                       "background-color: rgb(57, 171, 121);\n"
                                       "color: rgb(255, 255, 255);")
         self.pushButton.setObjectName("pushButton")
+        self.pushButton.clicked.connect(self.validate_register)
+
         self.label_2 = QtWidgets.QLabel(self)
         self.label_2.setGeometry(QtCore.QRect(70, 530, 261, 20))
         self.label_2.setLayoutDirection(QtCore.Qt.LeftToRight)
@@ -107,7 +113,7 @@ class Ui_Register(QtWidgets.QWidget):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("Form", "Form"))
+        self.setWindowTitle(_translate("Form", "Daftar"))
         self.label_4.setText(_translate("Form", "By: @harismuhajir"))
         self.lineEdit.setPlaceholderText(
             _translate("Form", "Masukkan username"))
@@ -126,3 +132,50 @@ class Ui_Register(QtWidgets.QWidget):
 
     def gotoLogin(self):
         self.switchWindow.emit("LOGIN")
+
+    def validate_register(self):
+        error = False
+        errorMessage = ""
+        if not self.lineEdit.text().strip():
+            error = True
+            errorMessage += "Username tidak boleh kosong\n"
+        if not self.lineEdit_2.text():
+            error = True
+            errorMessage += "Password tidak boleh kosong\n"
+        if not self.lineEdit_3.text():
+            error = True
+            errorMessage += "Konfirmasi password tidak boleh kosong\n"
+        if (not error) and (self.lineEdit_2.text() != self.lineEdit_3.text()):
+            error = True
+            errorMessage += "Konfirmasi password tidak cocok\n"
+
+        if(error):
+            QtWidgets.QMessageBox(
+                QtWidgets.QMessageBox.Critical,
+                "Error",
+                errorMessage
+            ).exec()
+        else:
+            (result, error) = User(self.db).register(
+                self.lineEdit.text(),
+                self.lineEdit_2.text()
+            )
+            if error:
+                errorMessage = ""
+                if error == "USERNAME_USED":
+                    errorMessage = "Username telah terpakai"
+                else:
+                    errorMessage = "Database error"
+                QtWidgets.QMessageBox(
+                    QtWidgets.QMessageBox.Critical,
+                    "Error",
+                    errorMessage
+                ).exec()
+            else:
+                QtWidgets.QMessageBox(
+                    QtWidgets.QMessageBox.Information,
+                    "Success",
+                    "Akun berhasil dibuat"
+                )
+                self.setUser.emit(result)
+                self.switchWindow.emit("MAIN")
