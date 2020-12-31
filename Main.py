@@ -43,6 +43,59 @@ def setupDb():
     return db
 
 
+def migrateDb(cursor):
+    # Migrate user table
+    sql = """CREATE TABLE IF NOT EXISTS users (id VARCHAR(100) NOT NULL, 
+    username VARCHAR(255) NOT NULL, 
+    password VARCHAR(100) NOT NULL, 
+    PRIMARY KEY (id));
+    """
+    cursor.execute(sql)
+
+    # Migrate history table
+    sql = """CREATE TABLE IF NOT EXISTS `histories` ( 
+        `id` VARCHAR(100) NOT NULL , 
+        `user_id` VARCHAR(100) NOT NULL,
+        `type` TINYINT NOT NULL , 
+        `amount` BIGINT NOT NULL , 
+        `info` TEXT NOT NULL , 
+        `date` DATE NOT NULL , 
+        PRIMARY KEY (`id`));
+    """
+    cursor.execute(sql)
+    # Add relation history to user table
+    sql = """ALTER TABLE `histories` 
+    ADD CONSTRAINT `history_users_user_id_foreign` 
+    FOREIGN KEY (`user_id`) 
+    REFERENCES `users`(`id`) 
+    ON DELETE CASCADE ON UPDATE CASCADE;
+    """
+    cursor.execute(sql)
+
+    # Migrate history table
+    sql = """CREATE TABLE IF NOT EXISTS `money_infos` ( 
+        `id` VARCHAR(100) NOT NULL , 
+        `user_id` VARCHAR(100) NOT NULL UNIQUE,
+        `income` BIGINT NOT NULL , 
+        `outcome` BIGINT NOT NULL , 
+        `balance` BIGINT NOT NULL ,
+        PRIMARY KEY (`id`));
+    """
+    cursor.execute(sql)
+    # Add relation history to user table
+    sql = """ALTER TABLE `money_infos` 
+    ADD CONSTRAINT `money_info_users_user_id_foreign` 
+    FOREIGN KEY (`user_id`) 
+    REFERENCES `users`(`id`) 
+    ON DELETE CASCADE ON UPDATE CASCADE;
+    """
+    cursor.execute(sql)
+
+    # Add MIGRATED table for migrated status
+    sql = """CREATE TABLE IF NOT EXISTS `migrated` (id INT(11) NOT NULL, PRIMARY KEY (id))"""
+    cursor.execute(sql)
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     env_path = Path('.') / '.env'
@@ -50,6 +103,13 @@ if __name__ == '__main__':
     db = setupDb()
 
     if not db == False:
+        cursor = db.cursor()
+
+        cursor.execute("SHOW TABLES LIKE 'migrated'")
+        migrated = cursor.rowcount
+        if(migrated == 0):
+            migrateDb(cursor)
+
         window_selector = WindowSelector()
         aex = app.exec_()
         db.close()
