@@ -33,3 +33,18 @@ class User:
                 return (False, "DB_ERROR")
         else:
             return (False, "USERNAME_USED")
+
+    def login(self, username, password):
+        sql = "SELECT * FROM `users` WHERE `username`=%s"
+        self.cursor.execute(sql, (username))
+        if self.cursor.rowcount > 0:
+            user = self.cursor.fetchone()
+            # get password
+            hashedPw = user[2]
+            result = bcrypt.checkpw(password, hashedPw)
+            if result:
+                return user[0]
+            else:
+                return False
+        else:
+            return False

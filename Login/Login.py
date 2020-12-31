@@ -1,13 +1,16 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from Repositories.UserRepository import User
 import source
 from MyUi import MyLabel
 
 
 class Ui_Login(QtWidgets.QWidget):
     switchWindow = QtCore.pyqtSignal(str)
+    setUser = QtCore.pyqtSignal(str)
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
+        self.db = db
         self.setObjectName("Form")
         self.resize(400, 560)
         self.setMinimumSize(QtCore.QSize(400, 560))
@@ -105,12 +108,44 @@ class Ui_Login(QtWidgets.QWidget):
             _translate("Form", "Masukkan password"))
         self.label_6.setText(_translate("Form", "Masuk Akun"))
         self.pushButton.setText(_translate("Form", "Masuk"))
+        self.pushButton.clicked.connect(self.doLogin)
         self.label_2.setText(_translate("Form", "Money Manager © 2020 "))
         self.label_7.setText(_translate("Form", "Belum punya akun? "))
         self.label_8.setText(_translate("Form", "Daftar"))
 
     def registerClicked(self):
         self.switchWindow.emit("REGISTER")
+
+    def doLogin(self):
+        error = False
+        errorMessage = ""
+        if not self.lineEdit.text().strip():
+            error = True
+            errorMessage += "Username tidak boleh kosong\n"
+        if not self.lineEdit_2.text().strip():
+            error = True
+            errorMessage += "Password tidak boleh kosong\n"
+
+        if(error):
+            QtWidgets.QMessageBox(
+                QtWidgets.QMessageBox.Critical,
+                "Error",
+                errorMessage
+            ).exec()
+        else:
+            result = User(self.db).login(
+                self.lineEdit.text(),
+                self.lineEdit_2.text()
+            )
+            if result:
+                self.setUser.emit(result)
+                self.switchWindow.emit("MAIN")
+            else:
+                QtWidgets.QMessageBox(
+                    QtWidgets.QMessageBox.Critical,
+                    "Error",
+                    "Username atau Password salah"
+                ).exec()
 
 
 if __name__ == "__main__":

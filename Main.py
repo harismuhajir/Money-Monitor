@@ -12,8 +12,9 @@ import pymysql
 class WindowSelector:
     def __init__(self, db):
         self.logged_in_user = ""
-        self.login_view = Login()
+        self.login_view = Login(db)
         self.login_view.switchWindow.connect(self.switch_window)
+        self.login_view.setUser.connect(self.set_user)
         self.register_view = Register(db)
         self.register_view.switchWindow.connect(self.switch_window)
         self.register_view.setUser.connect(self.set_user)

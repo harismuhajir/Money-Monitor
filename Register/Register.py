@@ -172,10 +172,5 @@ class Ui_Register(QtWidgets.QWidget):
                     errorMessage
                 ).exec()
             else:
-                QtWidgets.QMessageBox(
-                    QtWidgets.QMessageBox.Information,
-                    "Success",
-                    "Akun berhasil dibuat"
-                )
                 self.setUser.emit(result)
                 self.switchWindow.emit("MAIN")
