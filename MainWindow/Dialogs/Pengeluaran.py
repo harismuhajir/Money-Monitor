@@ -1,12 +1,19 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from Repositories.MoneyRepository import Money
 
-class Ui_Pengeluaran(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(360, 300)
-        Dialog.setMinimumSize(QtCore.QSize(360, 300))
-        Dialog.setMaximumSize(QtCore.QSize(360, 300))
-        self.label = QtWidgets.QLabel(Dialog)
+
+class Ui_Pengeluaran(QtWidgets.QDialog):
+    setBalance = QtCore.pyqtSignal(int)
+
+    def __init__(self, parent, db, userId):
+        super(Ui_Pengeluaran, self).__init__(parent)
+        self.db = db
+        self.userId = userId
+        self.setObjectName("Dialog")
+        self.resize(360, 300)
+        self.setMinimumSize(QtCore.QSize(360, 300))
+        self.setMaximumSize(QtCore.QSize(360, 300))
+        self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(QtCore.QRect(40, 10, 221, 51))
         font = QtGui.QFont()
         font.setFamily("Montserrat ExtraBold")
@@ -16,11 +23,12 @@ class Ui_Pengeluaran(object):
         self.label.setFont(font)
         self.label.setStyleSheet("color: rgb(57, 171, 121);")
         self.label.setObjectName("label")
-        self.dateEdit = QtWidgets.QDateEdit(Dialog)
+        self.dateEdit = QtWidgets.QDateEdit(self)
         self.dateEdit.setGeometry(QtCore.QRect(130, 70, 191, 31))
-        self.dateEdit.setDateTime(QtCore.QDateTime(QtCore.QDate(2020, 1, 1), QtCore.QTime(0, 0, 0)))
+        self.dateEdit.setDateTime(QtCore.QDateTime(
+            QtCore.QDate(2020, 1, 1), QtCore.QTime(0, 0, 0)))
         self.dateEdit.setObjectName("dateEdit")
-        self.label_4 = QtWidgets.QLabel(Dialog)
+        self.label_4 = QtWidgets.QLabel(self)
         self.label_4.setGeometry(QtCore.QRect(40, 71, 81, 31))
         font = QtGui.QFont()
         font.setFamily("Montserrat SemiBold")
@@ -31,7 +39,7 @@ class Ui_Pengeluaran(object):
         self.label_4.setFont(font)
         self.label_4.setStyleSheet("font: 63 10pt \"Montserrat SemiBold\";")
         self.label_4.setObjectName("label_4")
-        self.label_5 = QtWidgets.QLabel(Dialog)
+        self.label_5 = QtWidgets.QLabel(self)
         self.label_5.setGeometry(QtCore.QRect(40, 121, 81, 31))
         font = QtGui.QFont()
         font.setFamily("Montserrat SemiBold")
@@ -42,7 +50,7 @@ class Ui_Pengeluaran(object):
         self.label_5.setFont(font)
         self.label_5.setStyleSheet("font: 63 10pt \"Montserrat SemiBold\";")
         self.label_5.setObjectName("label_5")
-        self.label_6 = QtWidgets.QLabel(Dialog)
+        self.label_6 = QtWidgets.QLabel(self)
         self.label_6.setGeometry(QtCore.QRect(40, 171, 81, 31))
         font = QtGui.QFont()
         font.setFamily("Montserrat SemiBold")
@@ -53,42 +61,76 @@ class Ui_Pengeluaran(object):
         self.label_6.setFont(font)
         self.label_6.setStyleSheet("font: 63 10pt \"Montserrat SemiBold\";")
         self.label_6.setObjectName("label_6")
-        self.pushButton = QtWidgets.QPushButton(Dialog)
+        self.pushButton = QtWidgets.QPushButton(self)
         self.pushButton.setGeometry(QtCore.QRect(40, 221, 281, 41))
         self.pushButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.pushButton.setMouseTracking(False)
         self.pushButton.setStyleSheet("border-radius: 5px;\n"
-"font: 57 10pt \"Montserrat Medium\";\n"
-"background-color: rgb(57, 171, 121);\n"
-"color: rgb(255, 255, 255);")
+                                      "font: 57 10pt \"Montserrat Medium\";\n"
+                                      "background-color: rgb(57, 171, 121);\n"
+                                      "color: rgb(255, 255, 255);")
         self.pushButton.setObjectName("pushButton")
-        self.lineEdit = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit = QtWidgets.QLineEdit(self)
         self.lineEdit.setGeometry(QtCore.QRect(130, 170, 191, 31))
         self.lineEdit.setObjectName("lineEdit")
-        self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_2 = QtWidgets.QLineEdit(self)
         self.lineEdit_2.setGeometry(QtCore.QRect(130, 120, 191, 31))
         self.lineEdit_2.setObjectName("lineEdit_2")
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(self)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label.setText(_translate("Dialog", "Tambah Pengeluaran"))
         self.label_4.setText(_translate("Dialog", "Tanggal"))
         self.label_5.setText(_translate("Dialog", "Nominal"))
         self.label_6.setText(_translate("Dialog", "Keterangan"))
         self.pushButton.setText(_translate("Dialog", "Tambah"))
-        self.lineEdit.setPlaceholderText(_translate("Dialog", "Masukkan keperluan pengeluaran"))
-        self.lineEdit_2.setPlaceholderText(_translate("Dialog", "Masukkan nominal pengeluaran"))
+        self.pushButton.clicked.connect(self.insertPengeluaran)
+        self.lineEdit.setPlaceholderText(_translate(
+            "Dialog", "Masukkan keperluan pengeluaran"))
+        self.lineEdit_2.setPlaceholderText(_translate(
+            "Dialog", "Masukkan nominal pengeluaran"))
 
+    def insertPengeluaran(self):
+        error = False
+        errorMessage = ""
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Pengeluaran()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())
+        if not self.lineEdit.text().strip():
+            error = True
+            errorMessage += "Nominal wajib diisi\n"
+        if not self.lineEdit_2.text().strip():
+            error = True
+            errorMessage += "Keterangan wajib diisi\n"
+        if (not error) and (not self.lineEdit_2.text().strip().isnumeric()):
+            error = True
+            errorMessage += "Nominal harus berisi angka\n"
+        elif (not error) and (int(self.lineEdit_2.text().strip()) < 0):
+            error = True
+            errorMessage += "Nominal tidak boleh berisi angka negatif"
+
+        if(error):
+            QtWidgets.QMessageBox(
+                QtWidgets.QMessageBox.Critical,
+                "Error",
+                errorMessage
+            ).exec()
+        else:
+            dateS = self.dateEdit.text().split("/")
+            (result, error) = Money(self.db).insertOutcome(
+                int(self.lineEdit_2.text().strip()),
+                self.lineEdit.text(),
+                str(2000 + int(dateS[2])) + "-" + dateS[1] + "-" + dateS[0],
+                self.userId
+            )
+            if error:
+                QtWidgets.QMessageBox(
+                    QtWidgets.QMessageBox.Critical,
+                    "Error",
+                    "Database error"
+                ).exec()
+            else:
+                self.setBalance.emit(result)
+                self.close()

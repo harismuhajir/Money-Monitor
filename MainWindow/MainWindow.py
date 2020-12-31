@@ -15,10 +15,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         pemasukan_view.show()
 
     def pengeluaran(self):
-        self.pengeluaran = QtWidgets.QDialog()
-        self.ui = Ui_Pengeluaran()
-        self.ui.setupUi(self.pengeluaran)
-        self.pengeluaran.show()
+        pengeluaran_view = Ui_Pengeluaran(self, self.db, self.userId)
+        pengeluaran_view.setBalance.connect(self.updateBalance)
+        pengeluaran_view.show()
 
     def riwayat(self):
         self.riwayat = QtWidgets.QDialog()
