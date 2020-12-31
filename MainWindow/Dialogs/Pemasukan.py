@@ -123,7 +123,7 @@ class Ui_Pemasukan(QtWidgets.QDialog):
             (result, error) = Money(self.db).insertIncome(
                 int(self.lineEdit_2.text().strip()),
                 self.lineEdit.text(),
-                str(2020 + int(dateS[2])) + "-" + dateS[1] + "-" + dateS[0],
+                str(2000 + int(dateS[2])) + "-" + dateS[1] + "-" + dateS[0],
                 self.userId
             )
             if error:
