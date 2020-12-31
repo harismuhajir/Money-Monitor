@@ -73,3 +73,8 @@ class Money:
             print(e)
             self.db.rollback()
             return (False, True)
+
+    def getHistories(self, userId):
+        sql = "SELECT * FROM `histories` WHERE `user_id`=%s ORDER BY `date` DESC, `id` DESC"
+        self.cursor.execute(sql, (userId))
+        return (self.cursor.fetchall(), self.cursor.rowcount)

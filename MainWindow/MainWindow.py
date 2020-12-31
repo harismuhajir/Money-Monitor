@@ -20,10 +20,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         pengeluaran_view.show()
 
     def riwayat(self):
-        self.riwayat = QtWidgets.QDialog()
-        self.ui = Ui_Riwayat()
-        self.ui.setupUi(self.riwayat)
-        self.riwayat.show()
+        Ui_Riwayat(self, self.db, self.userId).show()
 
     def updateBalance(self, balance):
         self.lineEdit.setText(str(balance))
