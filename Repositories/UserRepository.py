@@ -41,7 +41,7 @@ class User:
             user = self.cursor.fetchone()
             # get password
             hashedPw = user[2]
-            result = bcrypt.checkpw(password, hashedPw)
+            result = bcrypt.checkpw(password.encode('utf8'), hashedPw.encode('utf8'))
             if result:
                 return user[0]
             else:
